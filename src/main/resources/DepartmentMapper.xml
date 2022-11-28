@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DepartmentMapper">
+    <resultMap id="departmentResult" type="department">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="primaryKey" column="primaryKey"/>
+    </resultMap>
+
+    <resultMap id="departmentDTOResult" type="departmentDTO">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+    </resultMap>
+
+    <select id="getDepartmentPaging" parameterType="paging" resultMap="departmentDTOResult">
+        <bind name="pattern" value="'%' + keyword + '%'"/>
+        SELECT * FROM Department WHERE name LIKE #{pattern} ORDER BY id LIMIT #{a},#{b}
+    </select>
+    <select id="getById" resultType="department" parameterType="int" resultMap="departmentResult">
+        SELECT * from Department where id =#{id}
+    </select>
+    <select id="getTotalItems" parameterType="String" resultType="int">
+        <bind name="pattern" value="'%' + keyword + '%'"/>
+        SELECT COUNT(id) FROM Department WHERE name LIKE #{pattern}
+    </select>
+    <insert id="insertDepartment" parameterType="department" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO Department(name , primaryKey) VALUES (#{name} , 0)
+    </insert>
+    <update id="updateDepartment" parameterType="department">
+        UPDATE Department SET name=#{name} WHERE id =#{id}
+    </update>
+    <delete id="deleteDepartment" parameterType="int">
+        DELETE FROM Department WHERE id =#{id}
+    </delete>
+    <select id="getExistByName" resultType="department" parameterType="String" resultMap="departmentResult">
+        select * from Department where name =#{name}
+    </select>
+</mapper>

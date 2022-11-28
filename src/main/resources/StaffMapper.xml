@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="StaffMapper">
+
+    <resultMap id="staffDTOResult" type="staffDTO">
+        <result property="id" column="id"/>
+        <result property="name" column="staff_name"/>
+        <result property="photo" column="photo"/>
+        <result property="departmentName" column="name"/>
+        <result property="gender" column="gender"/>
+        <result property="mobile" column="mobile"/>
+        <result property="join_On" column="join_On"/>
+    </resultMap>
+    <resultMap id="staffDetailDTOResult" type="staffDetailDTO">
+        <result property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="staff_name" column="staff_name"/>
+        <result property="department_name" column="name"/>
+        <result property="gender" column="gender"/>
+        <result property="email" column="email"/>
+        <result property="mobile" column="mobile"/>
+        <result property="photo" column="photo"/>
+        <result property="date_of_birth" column="date_of_birth"/>
+        <result property="join_on" column="join_on"/>
+        <result property="address" column="address"/>
+        <result property="city" column="city"/>
+        <result property="state" column="state"/>
+        <result property="country" column="country"/>
+    </resultMap>
+    <resultMap id="staffRequest" type="staffRequest">
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="staff_name" column="staff_name"/>
+        <result property="department_id" column="department_id"/>
+        <result property="gender" column="gender"/>
+        <result property="email" column="email"/>
+        <result property="mobile" column="mobile"/>
+        <result property="photo" column="photo"/>
+        <result property="date_of_birth" column="date_of_birth"/>
+        <result property="join_on" column="join_on"/>
+        <result property="address" column="address"/>
+        <result property="city" column="city"/>
+        <result property="state" column="state"/>
+        <result property="country" column="country"/>
+    </resultMap>
+
+    <select id="getStaffPaging" parameterType="paging" resultMap="staffDTOResult">
+        <bind name="pattern" value="'%' + keyword + '%'"/>
+        SELECT Staff.id, Staff.staff_name, Staff.photo , Department.name ,
+        Staff.gender,Staff.mobile,Staff.join_on
+        FROM Staff
+        INNER JOIN Department ON Staff.department_id = Department.id
+        INNER JOIN User ON Staff.user_id = User.id
+        where Staff.staff_name LIKE #{pattern} AND User.isEnabled = 1 ORDER BY id LIMIT #{a},#{b}
+    </select>
+
+    <select id="getByKeyword" parameterType="String" resultType="int" >
+        <bind name="pattern" value="'%' + keyword + '%'"/>
+        SELECT COUNT(Staff.id)
+        FROM Staff
+        INNER JOIN Department ON Staff.department_id = Department.id
+        INNER JOIN User ON Staff.user_id = User.id
+        where Staff.staff_name LIKE #{pattern} AND User.isEnabled = 1
+    </select>
+
+
+
+    <insert id="insertStaff" parameterType="staffRequest">
+        CALL insert_user_2(#{username},#{password},#{department_id},#{staff_name},#{photo},#{email},
+        #{date_of_birth},#{gender},#{mobile},#{address},#{city},#{state},#{country},#{join_on})
+    </insert>
+
+    <delete id="deleteStaff" parameterType="int">
+        UPDATE Staff, User
+        SET
+        User.isEnabled = 0
+        WHERE
+        Staff.user_id = User.id
+        AND Staff.id =  #{id};
+    </delete>
+
+    <select id="getById" resultType="staffDetailDTO" parameterType="int" resultMap="staffDetailDTOResult">
+        SELECT Staff.id, User.username , Staff.staff_name, Department.name , Staff.gender ,
+        Staff.email , Staff.Email , Staff.mobile ,Staff.photo , Staff.date_of_birth , Staff.join_on ,
+        Staff.address , Staff.city , Staff.state , Staff.country FROM Staff
+        INNER JOIN User ON Staff.user_id = User.id
+        INNER JOIN Department ON Staff.department_id = Department.id
+        WHERE Staff.id = #{id} AND User.isEnabled = 1
+    </select>
+
+    <select id="getStaffByUserId" resultType="staffDetailDTO" parameterType="int" resultMap="staffDetailDTOResult">
+        SELECT Staff.id, User.username , Staff.staff_name,Department.name , Staff.gender ,
+        Staff.email , Staff.Email , Staff.mobile ,Staff.photo , Staff.date_of_birth , Staff.join_on ,
+        Staff.address , Staff.city , Staff.state , Staff.country  FROM Staff
+        INNER JOIN User ON Staff.user_id = User.id
+        INNER JOIN Department ON Staff.department_id = Department.id
+        WHERE user_id = #{id} AND User.isEnabled = 1
+    </select>
+
+    <update id="updateStaff" parameterType="StaffRequestPart">
+        UPDATE Staff, User
+        SET    User.password = #{password},
+        Staff.staff_name = #{staff_name},
+        Staff.photo = #{photo},
+        Staff.department_id = #{department_id},
+        Staff.email = #{email},
+        Staff.gender = #{gender},
+        Staff.mobile = #{mobile},
+        Staff.date_of_birth = #{date_of_birth},
+        Staff.address = #{address},
+        Staff.city = #{city},
+        Staff.state = #{state},
+        Staff.country = #{country}
+        WHERE
+        Staff.user_id = User.id
+        AND Staff.id = #{id}
+        AND User.isEnabled = 1;
+    </update>
+
+    <update id="setDefaultDepartmentId" parameterType="int">
+        UPDATE Staff
+        SET department_id = 0
+        WHERE department_id = #{department_id};
+    </update>
+
+</mapper>

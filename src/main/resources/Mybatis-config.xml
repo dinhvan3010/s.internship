@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <typeAliases>
+        <typeAlias type="com.ywmobile.app.internship.model.Department" alias="department"/>
+        <typeAlias type="com.ywmobile.app.internship.model.User" alias="user"/>
+        <typeAlias type="com.ywmobile.app.internship.model.Staff" alias="staff"/>
+        <typeAlias type="com.ywmobile.app.internship.model.LeaveRequest" alias="leave"/>
+        <typeAlias type="com.ywmobile.app.internship.DTO.StaffDTO" alias="staffDTO"/>
+        <typeAlias type="com.ywmobile.app.internship.Request.StaffRequest" alias="staffRequest"/>
+        <typeAlias type="com.ywmobile.app.internship.DTO.StaffDetailDTO" alias="staffDetailDTO"/>
+        <typeAlias type="com.ywmobile.app.internship.DTO.Dashboard" alias="dashboard"/>
+        <typeAlias type="com.ywmobile.app.internship.DTO.LeaveDTO" alias="leaveDTO"/>
+        <typeAlias type="com.ywmobile.app.internship.DTO.Paging" alias="paging"/>
+        <typeAlias type="com.ywmobile.app.internship.DTO.DepartmentDTO" alias="departmentDTO"/>
+        <typeAlias type="com.ywmobile.app.internship.Request.StaffRequestPart" alias="StaffRequestPart"/>
+    </typeAliases>
+
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="com.mysql.cj.jdbc.Driver"/>
+                <property name="url" value="jdbc:mysql://localhost:3306/EmployeeManagement?useSSL=false"/>
+                <property name="username" value="root"/>
+                <property name="password" value="password"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <mappers>
+        <mapper resource="DepartmentMapper.xml"/>
+        <mapper resource="UserMapper.xml"/>
+        <mapper resource="StaffMapper.xml"/>
+        <mapper resource="LeaveMapper.xml"/>
+        <mapper resource="DashboardMapper.xml"/>
+    </mappers>
+
+</configuration>

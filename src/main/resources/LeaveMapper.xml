@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="LeaveMapper">
+
+    <resultMap id="leaveResult" type="leave">
+        <id property="id" column="id"/>
+        <result property="staff_id" column="staff_id"/>
+        <result property="reason" column="reason"/>
+        <result property="leave_from" column="leave_from"/>
+        <result property="leave_to" column="leave_to"/>
+        <result property="description" column="description"/>
+        <result property="status" column="status"/>
+        <result property="applied_on" column="applied_on"/>
+    </resultMap>
+
+    <resultMap id="leaveDTOResult" type="leaveDTO">
+        <id property="id" column="id"/>
+        <result property="staff_name" column="staff_name"/>
+        <result property="photo" column="photo"/>
+        <result property="department_name" column="name"/>
+        <result property="reason" column="reason"/>
+        <result property="leave_from" column="leave_from"/>
+        <result property="leave_to" column="leave_to"/>
+        <result property="description" column="description"/>
+        <result property="status" column="status"/>
+        <result property="applied_on" column="applied_on"/>
+    </resultMap>
+
+    <select id="getLeaveRequestPaging" parameterType="paging" resultMap="leaveDTOResult" >
+        <bind name="pattern" value="'%' + keyword + '%'" />
+        SELECT Staff.staff_name, Staff.photo , Department.name , `LeaveRequest`.id,
+        `LeaveRequest`.reason,`LeaveRequest`.leave_from,`LeaveRequest`.leave_to,`LeaveRequest`.description , `LeaveRequest`.applied_on, `LeaveRequest`.status
+        FROM Staff
+        INNER JOIN Department ON Staff.department_id = Department.id
+        INNER JOIN `LeaveRequest` ON Staff.id = `LeaveRequest`.staff_id
+        INNER JOIN User ON Staff.user_id = User.id
+        WHERE User.isEnabled = 1 AND Staff.staff_name LIKE #{pattern} ORDER BY id LIMIT #{a},#{b}
+    </select>
+
+
+
+    <select id="getCountLeave"  resultType="int"  parameterType="String" >
+        <bind name="pattern" value="'%' + keyword + '%'" />
+        SELECT COUNT( `LeaveRequest`.id)
+        FROM Staff
+        INNER JOIN Department ON Staff.department_id = Department.id
+        INNER JOIN `LeaveRequest` ON Staff.id = `LeaveRequest`.staff_id
+        INNER JOIN User ON Staff.user_id = User.id
+        WHERE Staff.staff_name LIKE #{pattern}  AND User.isEnabled = 1
+    </select>
+
+    <select id="getListLeaveRequest" resultMap="leaveDTOResult"  parameterType="paging" >
+        <bind name="pattern" value="'%' + keyword + '%'" />
+        SELECT Staff.staff_name, Staff.photo , Department.name ,`LeaveRequest`.id,
+        `LeaveRequest`.reason,`LeaveRequest`.leave_from,`LeaveRequest`.leave_to,`LeaveRequest`.description , `LeaveRequest`.applied_on, `LeaveRequest`.status
+        FROM Staff
+        INNER JOIN Department ON Staff.department_id = Department.id
+        INNER JOIN `LeaveRequest` ON Staff.id = `LeaveRequest`.staff_id
+        INNER JOIN User ON Staff.user_id = User.id
+        WHERE `LeaveRequest`.`status` = 'PENDING'  AND User.isEnabled = 1
+        AND  Staff.staff_name LIKE #{pattern} ORDER BY id LIMIT #{a},#{b}
+    </select>
+
+
+    <select id="getCountListLeaveRequestForStaff" resultType="int"  parameterType="paging" >
+        <bind name="pattern" value="'%' + keyword + '%'" />
+        SELECT COUNT( `LeaveRequest`.id) FROM `LeaveRequest` WHERE staff_id =#{staff_id} AND reason LIKE #{pattern}
+    </select>
+
+    <select id="getListLeaveForStaff" resultType="leave" parameterType="paging" resultMap="leaveResult">
+        <bind name="pattern" value="'%' + keyword + '%'" />
+        SELECT * FROM `LeaveRequest` WHERE staff_id =#{staff_id} AND reason LIKE #{pattern} ORDER BY id LIMIT #{a},#{b}
+    </select>
+
+
+    <select id="getCountListLeaveRequest" resultType="int"  parameterType="String" >
+        <bind name="pattern" value="'%' + keyword + '%'" />
+        SELECT COUNT(`LeaveRequest`.id)
+        FROM Staff
+        INNER JOIN Department ON Staff.department_id = Department.id
+        INNER JOIN `LeaveRequest` ON Staff.id = `LeaveRequest`.staff_id
+        INNER JOIN User ON Staff.user_id = User.id
+        WHERE `LeaveRequest`.`status` = 'PENDING'  AND User.isEnabled = 1
+        AND  Staff.staff_name LIKE #{pattern}
+    </select>
+
+    <select id="getById" parameterType="int" resultMap="leaveResult">
+        SELECT * FROM `LeaveRequest` WHERE id =#{id}
+    </select>
+
+    <insert id="insertLeave" parameterType="leave" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO `LeaveRequest` ( staff_id ,reason,leave_from,leave_to,description,`status`, applied_on) VALUES
+        (#{staff_id},#{reason},#{leave_from},#{leave_to},#{description},#{status},#{applied_on})
+    </insert>
+
+    <update id="updateStatusLeave" parameterType="leave">
+        Update `LeaveRequest` set status=#{status} where id=#{id}
+    </update>
+
+</mapper>
